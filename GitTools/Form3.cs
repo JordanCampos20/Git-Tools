@@ -39,21 +39,28 @@ namespace CreateIssueAuto
                     if (subproj.Contains(".git"))
                     {
                         text = string.Empty;
-                        using (Process process = new Process())
+                        try
                         {
-                            process.StartInfo.FileName = "cmd.exe";
-                            process.StartInfo.UseShellExecute = false;
-                            process.StartInfo.RedirectStandardInput = true;
-                            process.StartInfo.RedirectStandardOutput = true;
-                            process.Start();
-                            process.StandardInput.WriteLine($"cd {proj}");
-                            process.StandardInput.WriteLine($"git status");
-                            process.StandardInput.WriteLine("exit");
-                            while (!process.StandardOutput.EndOfStream)
-                                text += "\t" + process.StandardOutput.ReadLine() + "\n";
-                            output.Add(proj, text);
-                            process.WaitForExit();
-                            break;
+                            using (Process process = new Process())
+                            {
+                                process.StartInfo.FileName = "cmd.exe";
+                                process.StartInfo.UseShellExecute = false;
+                                process.StartInfo.RedirectStandardInput = true;
+                                process.StartInfo.RedirectStandardOutput = true;
+                                process.Start();
+                                process.StandardInput.WriteLine($"cd {proj}");
+                                process.StandardInput.WriteLine($"git status");
+                                process.StandardInput.WriteLine("exit");
+                                while (!process.StandardOutput.EndOfStream)
+                                    text += "\t" + process.StandardOutput.ReadLine() + "\n";
+                                output.Add(proj, text);
+                                process.WaitForExit();
+                                break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }

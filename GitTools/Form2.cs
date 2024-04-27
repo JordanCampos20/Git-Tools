@@ -22,20 +22,27 @@ namespace CreateIssueAuto
 
             for (int i = Convert.ToInt32(txtNrIssuesMin.Text); i <= Convert.ToInt32(txtNrIssuesMax.Text); i++)
             {
-                using (Process process = new Process())
+                try
                 {
-                    process.StartInfo.FileName = "cmd.exe";
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.RedirectStandardInput = true;
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.Start();
-                    process.StandardInput.WriteLine($"cd \"{txtFolder.Text}\"");
-                    process.StandardInput.WriteLine($"gh issue create -a \"@me\" -t \"{txtTitle.Text} {i}\" -b \"{txtBody.Text} {i}\"");
-                    process.StandardInput.WriteLine("exit");
-                    while (!process.StandardOutput.EndOfStream)
-                        text += "\t" + process.StandardOutput.ReadLine() + "\n";
-                    output.Add(txtFolder.Text, text);
-                    process.WaitForExit();
+                    using (Process process = new Process())
+                    {
+                        process.StartInfo.FileName = "cmd.exe";
+                        process.StartInfo.UseShellExecute = false;
+                        process.StartInfo.RedirectStandardInput = true;
+                        process.StartInfo.RedirectStandardOutput = true;
+                        process.Start();
+                        process.StandardInput.WriteLine($"cd \"{txtFolder.Text}\"");
+                        process.StandardInput.WriteLine($"gh issue create -a \"@me\" -t \"{txtTitle.Text} {i}\" -b \"{txtBody.Text} {i}\"");
+                        process.StandardInput.WriteLine("exit");
+                        while (!process.StandardOutput.EndOfStream)
+                            text += "\t" + process.StandardOutput.ReadLine() + "\n";
+                        output.Add($"{txtFolder.Text}_{i}", text);
+                        process.WaitForExit();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
