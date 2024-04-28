@@ -1,9 +1,14 @@
+using System.Data;
 using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CreateIssueAuto
 {
     public partial class Form2 : Form
     {
+        private bool _GenerateIssue = true;
+        private bool _GenerateBranchFromIssue = false;
+
         public Form2()
         {
             InitializeComponent();
@@ -30,9 +35,17 @@ namespace CreateIssueAuto
                         process.StartInfo.UseShellExecute = false;
                         process.StartInfo.RedirectStandardInput = true;
                         process.StartInfo.RedirectStandardOutput = true;
+                        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         process.Start();
                         process.StandardInput.WriteLine($"cd \"{txtFolder.Text}\"");
-                        process.StandardInput.WriteLine($"gh issue create -a \"@me\" -t \"{txtTitle.Text} {i}\" -b \"{txtBody.Text} {i}\"");
+                        if (_GenerateIssue)
+                        {
+                            process.StandardInput.WriteLine($"gh issue create -a \"@me\" -t \"{txtTitle.Text} {i}\" -b \"{txtBody.Text} {i}\"");
+                        }
+                        if (_GenerateBranchFromIssue)
+                        {
+                            process.StandardInput.WriteLine($"gh issue develop {i}");
+                        }
                         process.StandardInput.WriteLine("exit");
                         while (!process.StandardOutput.EndOfStream)
                             text += "\t" + process.StandardOutput.ReadLine() + "\n";
@@ -79,6 +92,8 @@ namespace CreateIssueAuto
                 if (folder.Contains(".git"))
                 {
                     txtFolder.Text = project;
+
+                    //VerifyIssue();
                 }
             }
         }
@@ -92,6 +107,98 @@ namespace CreateIssueAuto
             else
             {
                 groupBox1.Enabled = false;
+            }
+        }
+        private void chkCreateIssue_CheckedChanged(object sender, EventArgs e)
+        {
+            txtTitle.Enabled = chkCreateIssue.Checked;
+            txtBody.Enabled = chkCreateIssue.Checked;
+            _GenerateIssue = chkCreateIssue.Checked;
+        }
+
+        private void chkCreateBranchFromIssue_CheckedChanged(object sender, EventArgs e)
+        {
+            _GenerateBranchFromIssue = chkCreateBranchFromIssue.Checked;
+        }
+
+        private void VerifyIssue()
+        {
+            string text = string.Empty;
+
+            using (Process process = new Process())
+            {
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardInput = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.Start();
+                process.StandardInput.WriteLine($"cd \"{txtFolder.Text}\"");
+                process.StandardInput.WriteLine($"gh issue list");
+                process.StandardInput.WriteLine("exit");
+                while (!process.StandardOutput.EndOfStream)
+                    text += "\t" + process.StandardOutput.ReadLine() + "\n";
+                process.WaitForExit();
+            }
+
+            string issues = text.Substring(text.IndexOf("gh issue list")+14);
+
+            string exit = text.Substring(text.IndexOf("\t1\t")+39);
+
+            issues = issues.Replace(exit, "");
+
+            string[] issuesArr = issues.Split("\t");
+
+            issuesArr = issuesArr.Where(x=> !string.IsNullOrEmpty(x)).ToArray();
+
+            for (int i = 0; i < issuesArr.Length; i++)
+            {
+                string id = issuesArr[i]; 
+                string title = issuesArr[i + 1]; 
+                string labels = issuesArr[i + 2];
+                string updated = issuesArr[i + 3];
+
+                string branch = "";
+
+                string text_branch = string.Empty;
+
+                using (Process process = new Process())
+                {
+                    process.StartInfo.FileName = "cmd.exe";
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    process.Start();
+                    process.StandardInput.WriteLine($"cd \"{txtFolder.Text}\"");
+                    process.StandardInput.WriteLine($"gh issue develop {id} --list");
+                    process.StandardInput.WriteLine("exit");
+                    while (!process.StandardOutput.EndOfStream)
+                        text_branch += "\t" + process.StandardOutput.ReadLine() + "\n";
+                    process.WaitForExit();
+                }
+
+                string issues_branch = text_branch.Substring(text_branch.IndexOf($"gh issue develop {id} --list") + 29);
+
+                string exit_branch = text_branch.Substring(text_branch.IndexOf($"-{id}\t") + 39);
+
+                issues_branch = issues_branch.Replace(exit_branch, "");
+
+                string[] issues_branchArr = issues_branch.Split("\t");
+
+                issues_branchArr = issues_branchArr.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+                if (issues_branchArr.Contains($"{txtFolder.Text}>exit\n"))
+                {
+                    branch = "";
+                }
+                else
+                {
+                    branch = issues_branchArr[0];
+                }
+
+                GridIssues.Rows.Add(new string[] { id, title, branch, labels, updated, "TESTE" });
+                i += 3;
             }
         }
 
@@ -117,16 +224,19 @@ namespace CreateIssueAuto
                 return;
             }
 
-            if (txtTitle.Text.Length == 0)
+            if (chkCreateIssue.Checked)
             {
-                MessageBox.Show("Sem Titulo");
-                return;
-            }
+                if (txtTitle.Text.Length == 0)
+                {
+                    MessageBox.Show("Sem Titulo");
+                    return;
+                }
 
-            if (txtBody.Text.Length == 0)
-            {
-                MessageBox.Show("Sem corpo");
-                return;
+                if (txtBody.Text.Length == 0)
+                {
+                    MessageBox.Show("Sem corpo");
+                    return;
+                }
             }
 
             if (Convert.ToInt32(txtNrIssuesMin.Text) > Convert.ToInt32(txtNrIssuesMax.Text))

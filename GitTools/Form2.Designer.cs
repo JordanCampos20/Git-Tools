@@ -33,6 +33,8 @@
             txtFolder = new TextBox();
             label4 = new Label();
             groupBox1 = new GroupBox();
+            chkCreateBranchFromIssue = new CheckBox();
+            chkCreateIssue = new CheckBox();
             txtNrIssuesMin = new TextBox();
             btnSave = new Button();
             label3 = new Label();
@@ -41,7 +43,15 @@
             txtBody = new TextBox();
             label1 = new Label();
             txtTitle = new TextBox();
+            GridIssues = new DataGridView();
+            id = new DataGridViewTextBoxColumn();
+            TITLE = new DataGridViewTextBoxColumn();
+            BRANCH = new DataGridViewTextBoxColumn();
+            LABELS = new DataGridViewTextBoxColumn();
+            UPDATED = new DataGridViewTextBoxColumn();
+            CREATEBRANCH = new DataGridViewButtonColumn();
             groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)GridIssues).BeginInit();
             SuspendLayout();
             // 
             // btnFolder
@@ -75,6 +85,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(chkCreateBranchFromIssue);
+            groupBox1.Controls.Add(chkCreateIssue);
             groupBox1.Controls.Add(txtNrIssuesMin);
             groupBox1.Controls.Add(btnSave);
             groupBox1.Controls.Add(label3);
@@ -86,9 +98,33 @@
             groupBox1.Enabled = false;
             groupBox1.Location = new Point(11, 62);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(294, 150);
+            groupBox1.Size = new Size(294, 188);
             groupBox1.TabIndex = 11;
             groupBox1.TabStop = false;
+            // 
+            // chkCreateBranchFromIssue
+            // 
+            chkCreateBranchFromIssue.AutoSize = true;
+            chkCreateBranchFromIssue.Location = new Point(103, 161);
+            chkCreateBranchFromIssue.Name = "chkCreateBranchFromIssue";
+            chkCreateBranchFromIssue.Size = new Size(158, 19);
+            chkCreateBranchFromIssue.TabIndex = 20;
+            chkCreateBranchFromIssue.Text = "Create branch from Issue";
+            chkCreateBranchFromIssue.UseVisualStyleBackColor = true;
+            chkCreateBranchFromIssue.CheckedChanged += chkCreateBranchFromIssue_CheckedChanged;
+            // 
+            // chkCreateIssue
+            // 
+            chkCreateIssue.AutoSize = true;
+            chkCreateIssue.Checked = true;
+            chkCreateIssue.CheckState = CheckState.Checked;
+            chkCreateIssue.Location = new Point(8, 161);
+            chkCreateIssue.Name = "chkCreateIssue";
+            chkCreateIssue.Size = new Size(89, 19);
+            chkCreateIssue.TabIndex = 19;
+            chkCreateIssue.Text = "Create Issue";
+            chkCreateIssue.UseVisualStyleBackColor = true;
+            chkCreateIssue.CheckedChanged += chkCreateIssue_CheckedChanged;
             // 
             // txtNrIssuesMin
             // 
@@ -161,11 +197,62 @@
             txtTitle.Size = new Size(228, 23);
             txtTitle.TabIndex = 11;
             // 
+            // GridIssues
+            // 
+            GridIssues.AllowUserToAddRows = false;
+            GridIssues.AllowUserToDeleteRows = false;
+            GridIssues.AllowUserToResizeColumns = false;
+            GridIssues.AllowUserToResizeRows = false;
+            GridIssues.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            GridIssues.Columns.AddRange(new DataGridViewColumn[] { id, TITLE, BRANCH, LABELS, UPDATED, CREATEBRANCH });
+            GridIssues.Location = new Point(311, 12);
+            GridIssues.Name = "GridIssues";
+            GridIssues.ReadOnly = true;
+            GridIssues.Size = new Size(671, 238);
+            GridIssues.TabIndex = 12;
+            // 
+            // id
+            // 
+            id.HeaderText = "ID";
+            id.Name = "id";
+            id.ReadOnly = true;
+            // 
+            // TITLE
+            // 
+            TITLE.HeaderText = "TITLE";
+            TITLE.Name = "TITLE";
+            TITLE.ReadOnly = true;
+            // 
+            // BRANCH
+            // 
+            BRANCH.HeaderText = "BRANCH";
+            BRANCH.Name = "BRANCH";
+            BRANCH.ReadOnly = true;
+            // 
+            // LABELS
+            // 
+            LABELS.HeaderText = "LABELS";
+            LABELS.Name = "LABELS";
+            LABELS.ReadOnly = true;
+            // 
+            // UPDATED
+            // 
+            UPDATED.HeaderText = "UPDATED";
+            UPDATED.Name = "UPDATED";
+            UPDATED.ReadOnly = true;
+            // 
+            // CREATEBRANCH
+            // 
+            CREATEBRANCH.HeaderText = "CREATE BRANCH";
+            CREATEBRANCH.Name = "CREATEBRANCH";
+            CREATEBRANCH.ReadOnly = true;
+            // 
             // Form2
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(311, 223);
+            ClientSize = new Size(994, 260);
+            Controls.Add(GridIssues);
             Controls.Add(groupBox1);
             Controls.Add(label4);
             Controls.Add(txtFolder);
@@ -178,6 +265,7 @@
             Text = "Create issues auto";
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)GridIssues).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -197,5 +285,14 @@
         private TextBox txtBody;
         private Label label1;
         private TextBox txtTitle;
+        private CheckBox chkCreateBranchFromIssue;
+        private CheckBox chkCreateIssue;
+        private DataGridView GridIssues;
+        private DataGridViewTextBoxColumn id;
+        private DataGridViewTextBoxColumn TITLE;
+        private DataGridViewTextBoxColumn BRANCH;
+        private DataGridViewTextBoxColumn LABELS;
+        private DataGridViewTextBoxColumn UPDATED;
+        private DataGridViewButtonColumn CREATEBRANCH;
     }
 }
